@@ -7,28 +7,36 @@ class MyHomePage extends StatelessWidget {
   final String nama = "Brigitta"; 
   final String kelas = "PBP B"; 
 
+  final Color panPink = const Color(0xFFFF218D); 
+  final Color panYellow = const Color(0xFFFFD800);
+  final Color panBlue = const Color(0xFF1B8DFF);
+
 
   final List<ItemHomepage> items = [
-    ItemHomepage("Lihat Artwork", Icons.brush, Colors.blue),
-    ItemHomepage("Tambah Artwork", Icons.add_photo_alternate, Colors.green),
-    ItemHomepage("Logout", Icons.logout, Colors.red),
+    ItemHomepage("Art Gallery!", Icons.brush_rounded, const Color(0xFFFF218D)), 
+    ItemHomepage("Add Artwork!", Icons.add_photo_alternate_rounded, const Color(0xFFFFD800)), 
+    ItemHomepage("Logout!", Icons.logout_rounded, const Color(0xFF1BB3FF)), 
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF8F9FA), 
       appBar: AppBar(
+        elevation: 0,
+        backgroundColor: const Color(0xFF1C1917), 
         title: const Text(
           'MyPortfolio',
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
+            letterSpacing: 1.2,
           ),
         ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        centerTitle: true,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -36,39 +44,41 @@ class MyHomePage extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                InfoCard(title: 'NPM', content: npm),
-                InfoCard(title: 'Name', content: nama),
-                InfoCard(title: 'Class', content: kelas),
+                InfoCard(title: 'NPM', content: npm, icon: Icons.badge_rounded, iconColor: panPink),
+                InfoCard(title: 'Name', content: nama, icon: Icons.person_rounded, iconColor: panYellow),
+                InfoCard(title: 'Class', content: kelas, icon: Icons.school_rounded, iconColor: panBlue),
               ],
             ),
-            const SizedBox(height: 16.0),
+            const SizedBox(height: 30.0),
             
             // Area Grid Menu
-            Center(
-              child: Column(
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.only(top: 16.0),
-                    child: Text(
-                      'Selamat datang di MyPortfolio Mobile!',
+            Expanded(
+              child: Center(
+                child: Column(
+                  children: [
+                    const Text(
+                      'Welcome to My Creative Space! 🎨',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 18.0,
+                        fontSize: 22.0,
+                        color: Color(0xFF1C1917),
                       ),
+                      textAlign: TextAlign.center,
                     ),
-                  ),
-                  GridView.count(
-                    primary: true,
-                    padding: const EdgeInsets.all(20),
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    crossAxisCount: 3,
-                    shrinkWrap: true,
-                    children: items.map((ItemHomepage item) {
-                      return ItemCard(item);
-                    }).toList(),
-                  ),
-                ],
+                    const SizedBox(height: 20.0),
+                    GridView.count(
+                      primary: false,
+                      padding: const EdgeInsets.all(10),
+                      crossAxisSpacing: 15,
+                      mainAxisSpacing: 15,
+                      crossAxisCount: 3,
+                      shrinkWrap: true,
+                      children: items.map((ItemHomepage item) {
+                        return ItemCard(item);
+                      }).toList(),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -78,31 +88,45 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
-// ==========================================
-// KOMPONEN REUSABLE (BISA DIPAKE DIMANA AJA)
-// ==========================================
-
+// KOMPONEN INFO CARD
 class InfoCard extends StatelessWidget {
   final String title;
   final String content;
+  final IconData icon;
+  final Color iconColor;
 
-  const InfoCard({super.key, required this.title, required this.content});
+  const InfoCard({
+    super.key, 
+    required this.title, 
+    required this.content, 
+    required this.icon,
+    required this.iconColor
+  });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 2.0,
+      elevation: 4.0,
+      shadowColor: Colors.black12,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: Colors.white,
       child: Container(
-        width: MediaQuery.of(context).size.width / 3.5,
-        padding: const EdgeInsets.all(16.0),
+        width: MediaQuery.of(context).size.width / 3.8,
+        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
         child: Column(
           children: [
+            Icon(icon, color: iconColor, size: 28),
+            const SizedBox(height: 8.0),
             Text(
               title,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: Colors.grey),
             ),
-            const SizedBox(height: 8.0),
-            Text(content),
+            const SizedBox(height: 4.0),
+            Text(
+              content,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       ),
@@ -110,10 +134,11 @@ class InfoCard extends StatelessWidget {
   }
 }
 
+// MODEL & KOMPONEN ITEM CARD
 class ItemHomepage {
   final String name;
   final IconData icon;
-  final Color color; // Tambahan buat warna beda-beda
+  final Color color;
 
   ItemHomepage(this.name, this.icon, this.color);
 }
@@ -126,32 +151,44 @@ class ItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: item.color, // Pake warna dari model ItemHomepage
-      borderRadius: BorderRadius.circular(12),
+      color: item.color,
+      borderRadius: BorderRadius.circular(16),
+      elevation: 6,
+      shadowColor: item.color.withOpacity(0.6),
       child: InkWell(
+        borderRadius: BorderRadius.circular(16),
         onTap: () {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(
-              SnackBar(content: Text("Kamu telah menekan tombol ${item.name}!")),
+              SnackBar(
+                content: Text("Kamu telah menekan tombol ${item.name}!"),
+                backgroundColor: const Color(0xFF1C1917),
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
             );
         },
         child: Container(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(12),
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  item.icon,
-                  color: Colors.white,
-                  size: 30.0,
+                  item.icon, 
+                  color: item.color == const Color(0xFFFFD800) ? const Color(0xFF1C1917) : Colors.white, 
+                  size: 36.0
                 ),
-                const Padding(padding: EdgeInsets.all(3)),
+                const SizedBox(height: 8),
                 Text(
                   item.name,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(
+                    color: item.color == const Color(0xFFFFD800) ? const Color(0xFF1C1917) : Colors.white, 
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12
+                  ),
                 ),
               ],
             ),
