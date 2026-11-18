@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:myportfolio_mobile/widgets/left_drawer.dart';
+import 'package:myportfolio_mobile/screens/artwork_form.dart';
+import 'package:myportfolio_mobile/widgets/artwork_card.dart';
 
 class MyHomePage extends StatelessWidget {
   MyHomePage({super.key});
@@ -35,6 +38,7 @@ class MyHomePage extends StatelessWidget {
         ),
         centerTitle: true,
       ),
+      drawer: const LeftDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -74,7 +78,7 @@ class MyHomePage extends StatelessWidget {
                       crossAxisCount: 3,
                       shrinkWrap: true,
                       children: items.map((ItemHomepage item) {
-                        return ItemCard(item);
+                        return ArtworkCard(item);
                       }).toList(),
                     ),
                   ],
@@ -134,67 +138,3 @@ class InfoCard extends StatelessWidget {
   }
 }
 
-// MODEL & KOMPONEN ITEM CARD
-class ItemHomepage {
-  final String name;
-  final IconData icon;
-  final Color color;
-
-  ItemHomepage(this.name, this.icon, this.color);
-}
-
-class ItemCard extends StatelessWidget {
-  final ItemHomepage item;
-
-  const ItemCard(this.item, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: item.color,
-      borderRadius: BorderRadius.circular(16),
-      elevation: 6,
-      shadowColor: item.color.withOpacity(0.6),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: () {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: Text("Kamu telah menekan tombol ${item.name}!"),
-                backgroundColor: const Color(0xFF1C1917),
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-            );
-        },
-        child: Container(
-          padding: const EdgeInsets.all(12),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  item.icon, 
-                  color: item.color == const Color(0xFFFFD800) ? const Color(0xFF1C1917) : Colors.white, 
-                  size: 36.0
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  item.name,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: item.color == const Color(0xFFFFD800) ? const Color(0xFF1C1917) : Colors.white, 
-                    fontWeight: FontWeight.w700,
-                    fontSize: 12
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
