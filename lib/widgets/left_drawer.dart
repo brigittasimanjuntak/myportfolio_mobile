@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myportfolio_mobile/screens/menu.dart';
-import 'package:myportfolio_mobile/screens/artwork_form.dart'; // Impor form artwork
+import 'package:myportfolio_mobile/screens/artwork_form.dart';
+import 'package:myportfolio_mobile/screens/gallery_page.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -11,29 +12,14 @@ class LeftDrawer extends StatelessWidget {
       child: ListView(
         children: [
           const DrawerHeader(
-            decoration: BoxDecoration(
-              color: Color(0xFF1C1917), // Tema gelap web kamu
-            ),
+            decoration: BoxDecoration(color: Color(0xFF1C1917)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text(
-                  'My Portfolio',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
+                Text('My Portfolio', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
                 SizedBox(height: 8),
-                Text(
-                  'Explore my creative space!',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.white70,
-                  ),
-                ),
+                Text('Explore my creative space!', style: TextStyle(fontSize: 14, color: Colors.white70)),
               ],
             ),
           ),
@@ -41,9 +27,21 @@ class LeftDrawer extends StatelessWidget {
             leading: const Icon(Icons.home_outlined),
             title: const Text('Home'),
             onTap: () {
-              Navigator.pushReplacement(
+              // Pake pushAndRemoveUntil biar history-nya bersih waktu balik ke Home
+              Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => MyHomePage()),
+                (Route<dynamic> route) => false,
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.brush_outlined),
+            title: const Text('Art Gallery'),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const GalleryPage()),
               );
             },
           ),
@@ -51,9 +49,10 @@ class LeftDrawer extends StatelessWidget {
             leading: const Icon(Icons.add_photo_alternate_outlined),
             title: const Text('Add Artwork'),
             onTap: () {
+              // Pindah ke form tanpa numpuk history form sebelumnya
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => ArtworkFormPage()),
+                MaterialPageRoute(builder: (context) => const ArtworkFormPage()),
               );
             },
           ),

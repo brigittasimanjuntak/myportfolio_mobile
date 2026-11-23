@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myportfolio_mobile/screens/artwork_form.dart';
+import 'package:myportfolio_mobile/screens/gallery_page.dart';
 
 // Model Data
 class ItemHomepage {
@@ -37,15 +38,17 @@ class ArtworkCard extends StatelessWidget {
               ),
             );
 
-          // 2. Fitur Navigasi (Disesuaikan sama nama tombol di menu.dart)
+          // 2. Fitur Navigasi 
           if (item.name == "Add Artwork!") {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const ArtworkFormPage()),
             );
           } else if (item.name == "Art Gallery!") {
-            // Nanti kita arahin ke halaman list gallery
-            // Untuk sekarang biarin kosong dulu atau kasih dialog
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const GalleryPage()),
+            );
           }
         },
         child: Container(

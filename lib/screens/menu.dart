@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myportfolio_mobile/widgets/left_drawer.dart';
 import 'package:myportfolio_mobile/screens/artwork_form.dart';
+import 'package:myportfolio_mobile/screens/gallery_page.dart';
 import 'package:myportfolio_mobile/widgets/artwork_card.dart';
 
 class MyHomePage extends StatelessWidget {

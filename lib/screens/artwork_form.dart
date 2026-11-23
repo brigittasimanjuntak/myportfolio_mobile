@@ -13,18 +13,76 @@ class _ArtworkFormPageState extends State<ArtworkFormPage> {
   
   String _title = "";
   String _artist = "";
-  String _medium = "digital-art"; // Default value
+  String _medium = "digital-art"; 
   String _imageUrl = "";
   String _description = "";
 
   final List<String> _mediums = [
-    'digital-art',
-    'traditional',
-    'sketch',
-    '3d-model',
-    'photography',
-    'other',
+    'digital-art', 'traditional', 'sketch', '3d-model', 'photography', 'other',
   ];
+
+  // UI II A
+  Widget _buildTextInput({
+    required String label,
+    required String hint,
+    required ValueChanged<String> onChanged,
+    int maxLines = 1,
+    bool isRequired = true,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextFormField(
+        maxLines: maxLines,
+        decoration: InputDecoration(
+          hintText: hint,
+          labelText: label,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+        ),
+        onChanged: onChanged,
+        validator: (String? value) {
+          if (isRequired && (value == null || value.trim().isEmpty)) {
+            return "$label tidak boleh kosong!";
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
+  void _showSummaryDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Artwork berhasil ditambahkan!'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: [
+                Text('Title: $_title'),
+                const SizedBox(height: 4),
+                Text('Artist: $_artist'),
+                const SizedBox(height: 4),
+                Text('Medium: $_medium'),
+                const SizedBox(height: 4),
+                Text('URL: $_imageUrl'),
+                const SizedBox(height: 4),
+                Text('Description: $_description'),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.pop(context);
+                _formKey.currentState!.reset();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,155 +102,67 @@ class _ArtworkFormPageState extends State<ArtworkFormPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // === Title ===
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    hintText: "Artwork Title",
-                    labelText: "Artwork Title",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                  ),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _title = value!;
-                    });
-                  },
-                  validator: (String? value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return "Title tidak boleh kosong!";
-                    }
-                    return null;
-                  },
-                ),
+              _buildTextInput(
+                label: "Title",
+                hint: "Artwork Title",
+                onChanged: (val) => setState(() => _title = val),
               ),
-
-              // === Artist ===
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    hintText: "Artist Name",
-                    labelText: "Artist",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                  ),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _artist = value!;
-                    });
-                  },
-                  validator: (String? value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return "Artist tidak boleh kosong!";
-                    }
-                    return null;
-                  },
-                ),
+              _buildTextInput(
+                label: "Artist",
+                hint: "Artist Name",
+                onChanged: (val) => setState(() => _artist = val),
               ),
-
-              // === Medium ===
+              
+              // Dropdown Medium
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: DropdownButtonFormField<String>(
                   decoration: InputDecoration(
                     labelText: "Art Medium",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
                   ),
                   initialValue: _medium,
-                  items: _mediums
-                      .map((medium) => DropdownMenuItem(
-                            value: medium,
-                            child: Text(medium),
-                          ))
-                      .toList(),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _medium = newValue!;
-                    });
-                  },
+                  items: _mediums.map((medium) => DropdownMenuItem(
+                    value: medium,
+                    child: Text(medium),
+                  )).toList(),
+                  onChanged: (val) => setState(() => _medium = val!),
                 ),
               ),
 
-              // === Image URL ===
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    hintText: "https://i.imgur.com/...",
-                    labelText: "Artwork URL (Image Link)",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                  ),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _imageUrl = value!;
-                    });
-                  },
-                ),
+              _buildTextInput(
+                label: "URL",
+                hint: "https://i.imgur.com/...",
+                onChanged: (val) => setState(() => _imageUrl = val),
+                isRequired: true, 
+              ),
+              _buildTextInput(
+                label: "Description",
+                hint: "Describe your masterpiece...",
+                onChanged: (val) => setState(() => _description = val),
+                maxLines: 4,
+                isRequired: false,
               ),
 
-              // === Description ===
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  maxLines: 4,
-                  decoration: InputDecoration(
-                    hintText: "Describe your masterpiece...",
-                    labelText: "Description",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                  ),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _description = value!;
-                    });
-                  },
-                ),
-              ),
-
-              // === Tombol Simpan ===
+              // Tombol Simpan
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all(const Color(0xFFFF218D)), // Warna Pan Pink
+                      backgroundColor: WidgetStateProperty.all(const Color(0xFFFF218D)),
                       foregroundColor: WidgetStateProperty.all(Colors.white),
+                      padding: WidgetStateProperty.all(
+                        const EdgeInsets.symmetric(horizontal: 40, vertical: 12)
+                      ),
                     ),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text('Artwork berhasil ditambahkan!'),
-                              content: Text(
-                                'Title: $_title\nArtist: $_artist\nMedium: $_medium\nURL: $_imageUrl\n\n(Data belum tersimpan ke database server)',
-                              ),
-                              actions: [
-                                TextButton(
-                                  child: const Text('OK'),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    _formKey.currentState!.reset();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
+                        _showSummaryDialog();
                       }
                     },
-                    child: const Text("Save"),
+                    child: const Text("Save", style: TextStyle(fontSize: 16)),
                   ),
                 ),
               ),
