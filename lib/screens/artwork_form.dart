@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:myportfolio_mobile/widgets/left_drawer.dart';
+import 'package:myportfolio_mobile/models/artwork.dart';
+import 'package:myportfolio_mobile/services/api_client.dart';
+import 'package:myportfolio_mobile/services/auth_state.dart';
+import 'package:myportfolio_mobile/widgets/auth_guard.dart';
+import 'package:provider/provider.dart';
 
 class ArtworkFormPage extends StatefulWidget {
   const ArtworkFormPage({super.key});
@@ -157,9 +162,50 @@ class _ArtworkFormPageState extends State<ArtworkFormPage> {
                         const EdgeInsets.symmetric(horizontal: 40, vertical: 12)
                       ),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        _showSummaryDialog();
+                        // 1. Cek login
+                        final isLoggedIn = await ensureLoggedIn(context);
+                        if (!isLoggedIn) return;
+
+                        // 2. Ambil Token
+                        final token = context.read<AuthState>().token;
+                        if (token == null) return;
+
+                        // 3. Bikin Object Artwork
+                        final newArtwork = Artwork(
+                          title: _title,
+                          description: _description,
+                          artist: _artist,
+                          medium: _medium,
+                          imageUrl: _imageUrl,
+                        );
+
+                        // 4. Tembak API
+                        try {
+                          await context.read<ApiClient>().createArtwork(newArtwork, token: token);
+                          
+                          if (!context.mounted) return;
+                          showDialog(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: const Text('Sukses!'),
+                              content: Text('Artwork "${newArtwork.title}" berhasil disimpan ke database Django!'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(ctx); // Tutup dialog
+                                    Navigator.pop(context); // Balik ke menu
+                                  },
+                                  child: const Text('OK'),
+                                )
+                              ],
+                            ),
+                          );
+                        } on ApiException catch (e) {
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: ${e.message}')));
+                        }
                       }
                     },
                     child: const Text("Save", style: TextStyle(fontSize: 16)),

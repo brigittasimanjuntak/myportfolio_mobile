@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:myportfolio_mobile/screens/menu.dart';
 import 'package:myportfolio_mobile/screens/artwork_form.dart';
 import 'package:myportfolio_mobile/screens/gallery_page.dart';
+import 'package:myportfolio_mobile/services/auth_state.dart';
+import 'package:myportfolio_mobile/widgets/auth_guard.dart';
+import 'package:provider/provider.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final isLoggedIn = context.watch<AuthState>().isLoggedIn;
     return Drawer(
       child: ListView(
         children: [
@@ -26,36 +30,43 @@ class LeftDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.home_outlined),
             title: const Text('Home'),
-            onTap: () {
-              // Pake pushAndRemoveUntil biar history-nya bersih waktu balik ke Home
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => MyHomePage()),
-                (Route<dynamic> route) => false,
-              );
-            },
+            onTap: () => Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => MyHomePage()), (route) => false),
           ),
           ListTile(
             leading: const Icon(Icons.brush_outlined),
             title: const Text('Art Gallery'),
-            onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const GalleryPage()),
-              );
-            },
+            onTap: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const GalleryPage())),
           ),
           ListTile(
             leading: const Icon(Icons.add_photo_alternate_outlined),
             title: const Text('Add Artwork'),
-            onTap: () {
-              // Pindah ke form tanpa numpuk history form sebelumnya
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const ArtworkFormPage()),
-              );
+            onTap: () async {
+              final ok = await ensureLoggedIn(context);
+              if (ok && context.mounted) {
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ArtworkFormPage()));
+              }
             },
           ),
+          const Divider(),
+          if (!isLoggedIn)
+            ListTile(
+              leading: const Icon(Icons.login, color: Colors.blue),
+              title: const Text('Login (Admin)', style: TextStyle(color: Colors.blue)),
+              onTap: () async {
+                Navigator.pop(context);
+                await ensureLoggedIn(context);
+              },
+            )
+          else
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.red),
+              title: const Text('Logout', style: TextStyle(color: Colors.red)),
+              onTap: () {
+                context.read<AuthState>().logout();
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Berhasil Logout!')));
+              },
+            ),
         ],
       ),
     );
